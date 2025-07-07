@@ -1,0 +1,15 @@
+# Utilise une image Python légère
+FROM python:3.11-slim
+
+# Définit le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copie tous les fichiers de l'application dans le conteneur
+COPY . .
+
+# Installe les dépendances
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Commande de démarrage du serveur
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
