@@ -1,10 +1,10 @@
-from contextlib import contextmanager
-from sqlmodel import Session
-from app.database import get_session
+from typing import AsyncGenerator
+from sqlmodel.ext.asyncio.session import AsyncSession  # ✅
+from app.database import async_session
 
-def get_db():
-    db = get_session()
-    try:
-        yield db
-    finally:
-        db.close()
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with async_session() as session:
+        yield session
+        await session.commit()
+#         await session.refresh(materiel)

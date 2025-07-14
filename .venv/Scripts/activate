@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\mini_erm_backend\materiels_service\.venv"
+VIRTUAL_ENV="D:\MINI_ERP_BackEnd_Microservices_Folder\materiels_service\.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

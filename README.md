@@ -1,112 +1,145 @@
-# 🛠️ Materiels Service - Mini ERP MIF Maroc
+# 📦 materiels_service
 
-Microservice de gestion des matériels pour le projet **Mini ERP** de l'entreprise **MIF Maroc**.
-
-Développé avec **FastAPI**, **SQLModel**, **SQLite**, et testé avec **Pytest**. Ce service gère les opérations CRUD pour les matériels techniques installés sur les différents sites.
-
----
-
-## 📦 Fonctionnalités
-
-- 📄 **Créer** un matériel (`POST /materiels/`)
-- 📋 **Lister** tous les matériels (`GET /materiels/`)
-- ✏️ **Mettre à jour** un matériel (`PUT /materiels/{id}`)
-- 🗑️ **Supprimer** un matériel (`DELETE /materiels/{id}`)
+Microservice de gestion des matériels — Mini ERP MIF Maroc  
+Développé avec **FastAPI**, **SQLModel**, **JWT**, et testé avec **pytest**.
 
 ---
 
-## 🧱 Technologies
+## 🚀 Objectif
 
-| Composant         | Version / Stack        |
-|-------------------|------------------------|
-| Python            | 3.10+                  |
-| Framework         | FastAPI                |
-| ORM               | SQLModel               |
-| DB Dév            | SQLite                 |
-| Test              | Pytest + TestClient    |
-| Authentification  | (à intégrer via JWT)   |
-| Déploiement       | Docker                 |
+Ce service permet de gérer le **cycle de vie des matériels** dans le système Mini ERP : création, mise à jour, suppression, statut, suivi de maintenance, et statistiques.
 
 ---
 
-## 🚀 Lancer le service
+## 🧩 Fonctionnalités
 
-### ▶️ En local (dev)
+### ✅ Fonctionnalités de base
 
-```bash
-uvicorn app.main:app --reload
+- 📥 **Créer un matériel**  
+  `POST /materiels/`  
+  → Ajouter un matériel avec nom, référence, site, prochaine maintenance, etc.
+
+- 📄 **Lister tous les matériels**  
+  `GET /materiels/`  
+  → Filtrage possible par :
+  - `statut` (`actif`, `en_maintenance`, `hors_service`, `en_panne`)
+  - `site_id`
+  - pagination (`skip`, `limit`)
+
+- 🔍 **Rechercher un matériel**  
+  `GET /materiels/search/?query=...`  
+  → Recherche par `nom` ou `référence`.
+
+- 📌 **Voir un matériel par ID**  
+  `GET /materiels/{materiel_id}`
+
+- ✏️ **Modifier un matériel**  
+  `PUT /materiels/{materiel_id}`
+
+- ♻️ **Changer uniquement le statut**  
+  `PATCH /materiels/{materiel_id}/statut`
+
+- ❌ **Supprimer un matériel**  
+  `DELETE /materiels/{materiel_id}`
+
+---
+
+### 🔧 Fonctionnalités supplémentaires
+
+- ⏰ **Lister les matériels en retard de maintenance**  
+  `GET /materiels/en-retard/`  
+  → Affiche tous les matériels dont `prochaine_maintenance < date actuelle`.
+
+- 📊 **Statistiques globales**  
+  `GET /materiels/stats`  
+  → Exemple de sortie :
+  ```json
+  {
+    "total": 15,
+    "actifs": 10,
+    "en_maintenance": 2,
+    "hors_service": 2,
+    "en_panne": 1
+  }
 ````
 
-Accès docs :
-
-* Swagger: [http://localhost:8000/docs](http://localhost:8000/docs)
-* ReDoc: [http://localhost:8000/redoc](http://localhost:8000/redoc)
-
 ---
 
-### 🐳 Docker
+## 🔐 Sécurité
 
-#### Dockerfile (inclus)
+* Authentification par **JWT** (via `auth_service`)
+* Accès restreint pour les admins sur certaines routes :
 
-```bash
-docker build -t materiels_service .
-docker run -d -p 8000:8000 materiels_service
-```
+  * Création
+  * Suppression
+  * Mise à jour
+  * Changement de statut
 
 ---
 
 ## 🧪 Tests unitaires
 
+* Framework : `pytest`, `httpx.AsyncClient`, `pytest-asyncio`
+* Lancer les tests :
+
 ```bash
 pytest -v
 ```
 
-Tous les tests se trouvent dans :
-`app/tests/test_materiels.py` ✅
+* Tous les tests **✅ PASSENT** :
+
+  * Création, lecture, recherche, mise à jour, suppression
+  * Fonctionnalités avancées testées : maintenance en retard, stats
 
 ---
 
-## 🗃️ Structure du projet
+## 🐳 Dockerisation
 
-```
-materiels_service/
-├── app/
-│   ├── main.py
-│   ├── database.py
-│   ├── models/
-│   │   └── materiel_model.py
-│   ├── schemas/
-│   │   └── materiel_schema.py
-│   ├── routes/
-│   │   └── materiels.py
-│   ├── services/
-│   │   └── materiel_service.py
-│   └── tests/
-│       ├── test_materiels.py
-│       └── conftest.py
-├── Dockerfile
-└── requirements.txt
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY . .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 ---
 
-## 🔒 Sécurité
+## 📎 Documentation
 
-> Ce microservice peut être sécurisé via l'authentification JWT en intégrant un `Depends(get_current_user)` à chaque route critique. (non activé ici pour simplifier le développement)
-
----
-
-## 📚 Auteurs
-
-* Développé par **Rochdi** pour **MIF Maroc**
-* Encadrant : Mr **Lahlou**
+* Swagger UI : [http://localhost:8000/docs](http://localhost:8000/docs)
+* Redoc : [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
 ---
 
-## ✅ Statut du service
+## 🛠️ Technologies
 
-| Testé | Déployable | Stable | Sécurisé (auth) |
-| ----- | ---------- | ------ | --------------- |
-| ✔️    | ✔️         | ✔️     | ❌ (à intégrer)  |
+* FastAPI + SQLModel (Async)
+* Pydantic v2
+* SQLite / PostgreSQL
+* httpx + pytest
+* Docker
+
+---
+
+## ✅ Statut : `STABLE & TESTÉ`
+
+```
+✔️ 100% des tests unitaires réussis
+✔️ Routes sécurisées
+✔️ Dockerisé
+✔️ Prêt à l'intégration
+```
+
+---
+
+## 🔗 Auteur
+
+Projet Mini ERP — MIF Maroc
+Développé par \[Rochdi Sabir]
 
 ```

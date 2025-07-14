@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\mini_erm_backend\materiels_service\.venv
+set VIRTUAL_ENV=D:\MINI_ERP_BackEnd_Microservices_Folder\materiels_service\.venv
 
 if not defined PROMPT set PROMPT=$P$G
 
